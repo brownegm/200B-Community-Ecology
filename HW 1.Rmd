@@ -1,0 +1,242 @@
+---
+title: "Browne_Homework1_200B"
+author: "Marvin Browne"
+date: "March 1, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##1.A. Construct code for a null model than can be used to test if the observed range of a trait across species in a plot is different from a null model that removes the associations of species with particular plots, but retains all other ecological features of the data. Your script should calculate a two-tailed p-value and a standard effect size. Assume that all species in the pool have an equal chance of dispensing into the plot. Use the code to assess patterns at plot#25. Test first for reduced range in log leaf area, then for log seed size. How do you interpret the results?
+
+```{r echo=TRUE}
+##Data Management##
+library(readr)#load library for loading data
+#load the given data:
+species_pool <-read_csv("species_pool.csv")
+plot_data <- read_csv("plot_data.csv")
+
+plot25data <- subset(plot_data, plot_data[,1]==25)#create a subset of the plot data file that only has the plot 25 information. 
+plot25 <- merge(species_pool,plot25data, by= "species")#merge the subset with the corresponding trait values in the species pool dataset
+
+plot25#view that dataframe
+
+######################################################################################
+```
+
+```{r}
+#Analysis of Log Leaf Size
+# number of species in focal community for null model:
+N<-length(plot25)-1
+
+null_ave_range<-NA#establish a vector to hold the values from the randomly sampled communities
+
+
+reps<- 999## number of iterations of null model to run
+
+## loop to generate null communities and calculate range of trait values within that community
+for(i in 1:reps){
+	
+	sample(species_pool$logLeafArea,N)->random_community#sample the trait(here logLeafArea) values of six species throughout the species pool.
+	
+	null_ave_range[i]<- max(random_community)-min(random_community)#find the range of the trait values for each random community sampled from the the species pool.
+}
+
+hist(null_ave_range, xlab=expression("Expected Log Leaf Area"), main="Distribution from Null Model, N=6", col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range), lty=2)
+text("mean", x=mean(null_ave_range), y=180, pos=4)
+
+## add the observed body size ratio from tree #3
+  max(plot25$logLeafArea)-min(plot25$logLeafArea)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+
+
+```
+
+```{r}
+
+## calculate a p value with a two tailed test
+
+## how many null values is the observed value less than?
+n_more <- sum(obs_range<null_ave_range)
+## how many null values is the observed value greater than?
+n_less <-sum(obs_range>null_ave_range)
+## how many null values is the observed value tied with (this is especially an issue here because there are a small number of species in the pool- with larger pools ties are less common)
+n_tied<-sum(obs_range==null_ave_range)
+
+## p results  (observed value are added to the null distribution, hence 999 reps in the null and 999+1 in the denominator of the p value calculation)
+
+## construct a two tailed test
+
+if(n_less< ((reps+1)/2)){
+	print(c("two tailed test, p:", (n_less + n_tied/2)*2 / (reps+1) ))
+}else{
+	print(c("two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
+}
+
+## calculate the standard effect size (s.e.s.)- a measure of the difference between the observed and expected value, expressed in terms of standard deviations of the null model:
+
+#calculate mean and standard deviation of null distribution:
+null_mean<-mean(null_ave_range)
+null_sd<-sd(null_ave_range)
+
+size_range_SES<-(obs_range- null_mean)/null_sd
+
+print(c("standard effect size:", round(size_range_SES, 3)))
+
+```
+
+
+```{r}
+##################################################################################
+##Analysis of Log Seed Size
+
+null_ave_range<-NA#establish a vector to hold the values from the randomly sampled communities
+
+
+reps<- 999## number of iterations of null model to run
+
+## loop to generate null communities and calculate range of trait values within that community
+for(i in 1:reps){
+	
+	sample(species_pool$logSeedSize,N)->random_community#sample the trait(here logLeafArea) values of six species throughout the species pool.
+	
+	null_ave_range[i]<- max(random_community)-min(random_community)#find the range of the trait values for each random community sampled from the the species pool.
+}
+#Display the frequency of trait ranges for seed size across the random communities
+hist(null_ave_range, xlab=expression("Expected Log Seed Size"), main="Distribution from Null Model, N=6", col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range), lty=2)
+text("mean", x=mean(null_ave_range), y=180, pos=4)
+
+## add the observed body size ratio from tree #3
+  max(plot25$logSeedSize)-min(plot25$logSeedSize)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+
+#######
+
+## calculate a p value with a two tailed test
+
+## how many null values is the observed value less than?
+n_more <- sum(obs_range<null_ave_range)
+## how many null values is the observed value greater than?
+n_less <-sum(obs_range>null_ave_range)
+## how many null values is the observed value tied with (this is especially an issue here because there are a small number of species in the pool- with larger pools ties are less common)
+n_tied<-sum(obs_range==null_ave_range)
+
+## p results  (observed value are added to the null distribution, hence 999 reps in the null and 999+1 in the denominator of the p value calculation)
+
+## construct a two tailed test
+
+if(n_less< ((reps+1)/2)){
+	print(c("two tailed test, p:", (n_less + n_tied/2)*2 / (reps+1) ))
+}else{
+	print(c("two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
+}
+
+## calculate the standard effect size (s.e.s.)- a measure of the difference between the observed and expected value, expressed in terms of standard deviations of the null model:
+
+#calculate mean and standard deviation of null distribution:
+null_mean<-mean(null_ave_range)
+null_sd<-sd(null_ave_range)
+
+size_range_SES<-(obs_range- null_mean)/null_sd
+
+print(c("standard effect size:", round(size_range_SES, 3)))
+```
+
+Based on the results from these anaylses, I would conclude that the leaf size of species within a given location would be significantly different from the range of values of that trait across the species pool. This finding may be the result of environmental filter whereby the conditions of plot 25 would confer some benefit to certain morphologies in residents of the plot compare to others, thus improving their survivability. Conversely, the range of seed sizes were not significantly with the random population's trait values. This may imply that a general seed size may benefit the entire community experience similar large scale abiotic and biotic interactions. Other seed or leaf traits may vary differently from these depending on how well different niches within a community favor certain characteristics.  
+
+
+
+##1.B. Repeat the procedure in 1A, this time modifying the null model to give all individuals in the species pool the same chance of dispersing a seed into te plot. How do the results change? How, biologically and statistically speaking, do you interpret the difference between the two sets of null model results? Which is more conservative?
+```{r}
+#Analysis of Log Leaf Size 
+# number of species in focal community for null model:
+N<-length(plot25)-1
+
+null_ave_range2<-NA#establish a vector to hold the values from the randomly sampled communities
+
+reps<- 999## number of iterations of null model to run
+
+## loop to generate null communities and calculate range of trait values within that community
+for(i in 1:reps){
+	
+	sample(species_pool$logLeafArea,N, prob= (species_pool$abundance)/sum(species_pool$abundance))->random_community#sample the trait(here logLeafArea) values of six species throughout the species pool.
+	
+	null_ave_range2[i]<- max(random_community)-min(random_community)#find the range of the trait values for each random community sampled from the the species pool.
+}
+
+hist(null_ave_range2, xlab=expression("Expected Log Leaf Area"), main="Distribution from Null Model, N=6", col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range2, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range2), lty=2)
+text("mean", x=mean(null_ave_range2), y=180, pos=4)
+
+## add the observed body size ratio from tree #3
+  max(plot25$logLeafArea)-min(plot25$logLeafArea)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+
+```
+
+```{r}
+## calculate a p value with a two tailed test
+pval_ses<-function(reps=999){#create function to run two tail test and standard effect size calculations...Make sure the variables obs_range,null_ave_range2 are calculated for the given null model before running.
+## how many null values is the observed value less than?
+n_more <- sum(obs_range<null_ave_range2)
+## how many null values is the observed value greater than?
+n_less <-sum(obs_range>null_ave_range2)
+## how many null values is the observed value tied with (this is especially an issue here because there are a small number of species in the pool- with larger pools ties are less common)
+n_tied<-sum(obs_range==null_ave_range2)
+
+## p results  (observed value are added to the null distribution, hence 999 reps in the null and 999+1 in the denominator of the p value calculation)
+
+## construct a two tailed test
+
+if(n_less< ((reps+1)/2)){
+	print(c("two tailed test, p:", (n_less + n_tied/2)*2 / (reps+1) ))
+}else{
+	print(c("two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
+}
+
+## calculate the standard effect size (s.e.s.)- a measure of the difference between the observed and expected value, expressed in terms of standard deviations of the null model:
+
+#calculate mean and standard deviation of null distribution:
+null_mean2<-mean(null_ave_range2)
+null_sd2<-sd(null_ave_range2)
+
+size_range_SES<-(obs_range- null_mean2)/null_sd2
+
+print(c("standard effect size:", round(size_range_SES, 3)))
+}
+pval_ses()
+```
