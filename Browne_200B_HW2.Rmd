@@ -1,0 +1,18 @@
+---
+title: "Browne_200B_HW2"
+author: "Marvin Browne"
+date: "March 8, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**_Simulating the interactions of fundamental processes_**
+
+**2A**
+```{r}
+setwd("~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology")
+
+```
