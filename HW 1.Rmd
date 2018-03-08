@@ -9,21 +9,24 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##1.A. Construct code for a null model than can be used to test if the observed range of a trait across species in a plot is different from a null model that removes the associations of species with particular plots, but retains all other ecological features of the data. Your script should calculate a two-tailed p-value and a standard effect size. Assume that all species in the pool have an equal chance of dispensing into the plot. Use the code to assess patterns at plot#25. Test first for reduced range in log leaf area, then for log seed size. How do you interpret the results?
+##*1.A. Construct code for a null model than can be used to test if the observed range of a trait across species in a plot is different from a null model that removes the associations of species with particular plots, but retains all other ecological features of the data. Your script should calculate a two-tailed p-value and a standard effect size. Assume that all species in the pool have an equal chance of dispensing into the plot. Use the code to assess patterns at plot#25. Test first for reduced range in log leaf area, then for log seed size. How do you interpret the results?*
 
 ```{r echo=TRUE}
 ##Data Management##
+setwd("~/UCLA/Winter 2018/200B/Nathan-Part III")
 library(readr)#load library for loading data
 #load the given data:
 species_pool <-read_csv("species_pool.csv")
 plot_data <- read_csv("plot_data.csv")
 
-plot25data <- subset(plot_data, plot_data[,1]==25)#create a subset of the plot data file that only has the plot 25 information. 
-plot25 <- merge(species_pool,plot25data, by= "species")#merge the subset with the corresponding trait values in the species pool dataset
+plot25data <- subset(plot_data, plot_data[,1]==25)#create a subset of the plot 
+#data file that only has the plot 25 information. 
+plot25 <- merge(species_pool,plot25data, by= "species")#merge the subset with the 
+#corresponding trait values in the species pool dataset
 
 plot25#view that dataframe
 
-######################################################################################
+#################################################################################
 ```
 
 ```{r}
@@ -31,20 +34,28 @@ plot25#view that dataframe
 # number of species in focal community for null model:
 N<-length(plot25)-1
 
-null_ave_range<-NA#establish a vector to hold the values from the randomly sampled communities
+null_ave_range<-NA#establish a vector to hold the values from the randomly sampled 
+
+#communities
 
 
 reps<- 999## number of iterations of null model to run
 
-## loop to generate null communities and calculate range of trait values within that community
+## loop to generate null communities and calculate range of trait values within 
+#that community
 for(i in 1:reps){
 	
-	sample(species_pool$logLeafArea,N)->random_community#sample the trait(here logLeafArea) values of six species throughout the species pool.
+	sample(species_pool$logLeafArea,N)->random_community#sample the trait(here 
+  #logLeafArea) values of six species throughout the species pool.
 	
-	null_ave_range[i]<- max(random_community)-min(random_community)#find the range of the trait values for each random community sampled from the the species pool.
+	null_ave_range[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species 
+	#pool.
 }
 
-hist(null_ave_range, xlab=expression("Expected Log Leaf Area"), main="Distribution from Null Model, N=6", col="light grey")
+hist(null_ave_range, xlab=expression("Expected Log Leaf Area"), 
+     main="Distribution from Null Model, N=6",
+     col="light grey")
 
 ## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
 quantile(null_ave_range, probs=c(0.025, .975))->cutoffs
@@ -56,7 +67,7 @@ text("97.5%", x=cutoffs[2], y=180, pos=2.5)
 abline(v=mean(null_ave_range), lty=2)
 text("mean", x=mean(null_ave_range), y=180, pos=4)
 
-## add the observed body size ratio from tree #3
+## add the observed range from the sampled plot
   max(plot25$logLeafArea)-min(plot25$logLeafArea)->obs_range
 
 abline(v=obs_range, col='red', lwd=3)
@@ -73,10 +84,10 @@ text("observed value", x=obs_range, y=230, pos=4, col="red")
 n_more <- sum(obs_range<null_ave_range)
 ## how many null values is the observed value greater than?
 n_less <-sum(obs_range>null_ave_range)
-## how many null values is the observed value tied with (this is especially an issue here because there are a small number of species in the pool- with larger pools ties are less common)
+## how many null values is the observed value tied with?
 n_tied<-sum(obs_range==null_ave_range)
 
-## p results  (observed value are added to the null distribution, hence 999 reps in the null and 999+1 in the denominator of the p value calculation)
+## p results
 
 ## construct a two tailed test
 
@@ -86,7 +97,7 @@ if(n_less< ((reps+1)/2)){
 	print(c("two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
 }
 
-## calculate the standard effect size (s.e.s.)- a measure of the difference between the observed and expected value, expressed in terms of standard deviations of the null model:
+## calculate the standard effect size (s.e.s.)
 
 #calculate mean and standard deviation of null distribution:
 null_mean<-mean(null_ave_range)
@@ -98,25 +109,28 @@ print(c("standard effect size:", round(size_range_SES, 3)))
 
 ```
 
-
 ```{r}
-##################################################################################
+################################################################################
 ##Analysis of Log Seed Size
 
-null_ave_range<-NA#establish a vector to hold the values from the randomly sampled communities
-
+null_ave_range<-NA#establish a vector to hold the values from the randomly sampled
+#communities
 
 reps<- 999## number of iterations of null model to run
 
 ## loop to generate null communities and calculate range of trait values within that community
 for(i in 1:reps){
 	
-	sample(species_pool$logSeedSize,N)->random_community#sample the trait(here logLeafArea) values of six species throughout the species pool.
+	sample(species_pool$logSeedSize,N)->random_community#sample the trait(here logLeafArea) 
+  #values of six species throughout the species pool.
 	
-	null_ave_range[i]<- max(random_community)-min(random_community)#find the range of the trait values for each random community sampled from the the species pool.
+	null_ave_range[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species #    #pool.
 }
 #Display the frequency of trait ranges for seed size across the random communities
-hist(null_ave_range, xlab=expression("Expected Log Seed Size"), main="Distribution from Null Model, N=6", col="light grey")
+hist(null_ave_range, xlab=expression("Expected Log Seed Size"), 
+     main="Distribution from Null Model, N=6", 
+     col="light grey")
 
 ## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
 quantile(null_ave_range, probs=c(0.025, .975))->cutoffs
@@ -128,7 +142,7 @@ text("97.5%", x=cutoffs[2], y=180, pos=2.5)
 abline(v=mean(null_ave_range), lty=2)
 text("mean", x=mean(null_ave_range), y=180, pos=4)
 
-## add the observed body size ratio from tree #3
+## add the observed range from the sampled plot
   max(plot25$logSeedSize)-min(plot25$logSeedSize)->obs_range
 
 abline(v=obs_range, col='red', lwd=3)
@@ -142,10 +156,10 @@ text("observed value", x=obs_range, y=230, pos=4, col="red")
 n_more <- sum(obs_range<null_ave_range)
 ## how many null values is the observed value greater than?
 n_less <-sum(obs_range>null_ave_range)
-## how many null values is the observed value tied with (this is especially an issue here because there are a small number of species in the pool- with larger pools ties are less common)
+## how many null values is the observed value tied with ?
 n_tied<-sum(obs_range==null_ave_range)
 
-## p results  (observed value are added to the null distribution, hence 999 reps in the null and 999+1 in the denominator of the p value calculation)
+## p results  
 
 ## construct a two tailed test
 
@@ -155,7 +169,7 @@ if(n_less< ((reps+1)/2)){
 	print(c("two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
 }
 
-## calculate the standard effect size (s.e.s.)- a measure of the difference between the observed and expected value, expressed in terms of standard deviations of the null model:
+## calculate the standard effect size (s.e.s.)
 
 #calculate mean and standard deviation of null distribution:
 null_mean<-mean(null_ave_range)
@@ -166,29 +180,38 @@ size_range_SES<-(obs_range- null_mean)/null_sd
 print(c("standard effect size:", round(size_range_SES, 3)))
 ```
 
-Based on the results from these anaylses, I would conclude that the leaf size of species within a given location would be significantly different from the range of values of that trait across the species pool. This finding may be the result of environmental filter whereby the conditions of plot 25 would confer some benefit to certain morphologies in residents of the plot compare to others, thus improving their survivability. Conversely, the range of seed sizes were not significantly with the random population's trait values. This may imply that a general seed size may benefit the entire community experience similar large scale abiotic and biotic interactions. Other seed or leaf traits may vary differently from these depending on how well different niches within a community favor certain characteristics.  
+Based on the results from these analyses, I would conclude that the leaf size of species within a given location would be significantly different from the range of values of that trait across the species pool. This finding may be the result of environmental filter whereby the conditions of plot 25 would confer some benefit to certain morphologies in residents of the plot compare to others, thus improving their suitability. Conversely, the range of seed sizes were not significantly with the random population's trait values. This may imply that a general seed size may benefit the entire community experience similar large scale abiotic and biotic interactions. Other seed or leaf traits may vary differently from these depending on how well different niches within a community favor certain characteristics.  
 
 
+##*1.B. Repeat the procedure in 1A, this time modifying the null model to give all individuals in the species pool the same chance of dispersing a seed into te plot. How do the results change? How, biologically and statistically speaking, do you interpret the difference between the two sets of null model results? Which is more conservative?*
 
-##1.B. Repeat the procedure in 1A, this time modifying the null model to give all individuals in the species pool the same chance of dispersing a seed into te plot. How do the results change? How, biologically and statistically speaking, do you interpret the difference between the two sets of null model results? Which is more conservative?
 ```{r}
 #Analysis of Log Leaf Size 
 # number of species in focal community for null model:
 N<-length(plot25)-1
 
-null_ave_range2<-NA#establish a vector to hold the values from the randomly sampled communities
+null_ave_range2<-NA#establish a vector to hold the values from the randomly 
+#sampled communities
 
 reps<- 999## number of iterations of null model to run
 
-## loop to generate null communities and calculate range of trait values within that community
+## loop to generate null communities and calculate range of trait values within 
+#that community
 for(i in 1:reps){
 	
-	sample(species_pool$logLeafArea,N, prob= (species_pool$abundance)/sum(species_pool$abundance))->random_community#sample the trait(here logLeafArea) values of six species throughout the species pool.
+	sample(species_pool$logLeafArea,N, 
+	 prob= (species_pool$abundance)/sum(species_pool$abundance))->random_community
+  #sample the
+#trait(here logLeafArea) values of six species throughout the species pool.
 	
-	null_ave_range2[i]<- max(random_community)-min(random_community)#find the range of the trait values for each random community sampled from the the species pool.
+	null_ave_range2[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species 
+	#pool.
 }
 
-hist(null_ave_range2, xlab=expression("Expected Log Leaf Area"), main="Distribution from Null Model, N=6", col="light grey")
+hist(null_ave_range2, xlab=expression("Expected Log Leaf Area"),
+     main="Distribution from Null Model, N=6", 
+     col="light grey")
 
 ## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
 quantile(null_ave_range2, probs=c(0.025, .975))->cutoffs
@@ -210,15 +233,18 @@ text("observed value", x=obs_range, y=230, pos=4, col="red")
 
 ```{r}
 ## calculate a p value with a two tailed test
-pval_ses<-function(reps=999){#create function to run two tail test and standard effect size calculations...Make sure the variables obs_range,null_ave_range2 are calculated for the given null model before running.
-## how many null values is the observed value less than?
+pval_ses<-function(reps=999){#create function to run two tail test and standard 
+  #effect size calculations...Make sure the variables obs_range,null_ave_range2  
+  #are calculated for the given null model before running.
+
+  ## how many null values is the observed value less than?
 n_more <- sum(obs_range<null_ave_range2)
 ## how many null values is the observed value greater than?
 n_less <-sum(obs_range>null_ave_range2)
-## how many null values is the observed value tied with (this is especially an issue here because there are a small number of species in the pool- with larger pools ties are less common)
+## how many null values is the observed value tied with ?
 n_tied<-sum(obs_range==null_ave_range2)
 
-## p results  (observed value are added to the null distribution, hence 999 reps in the null and 999+1 in the denominator of the p value calculation)
+## p results  
 
 ## construct a two tailed test
 
@@ -228,7 +254,7 @@ if(n_less< ((reps+1)/2)){
 	print(c("two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
 }
 
-## calculate the standard effect size (s.e.s.)- a measure of the difference between the observed and expected value, expressed in terms of standard deviations of the null model:
+## calculate the standard effect size (s.e.s.)
 
 #calculate mean and standard deviation of null distribution:
 null_mean2<-mean(null_ave_range2)
@@ -240,3 +266,373 @@ print(c("standard effect size:", round(size_range_SES, 3)))
 }
 pval_ses()
 ```
+
+```{r}
+##################################################################################
+##Analysis of Log Seed Size
+
+null_ave_range<-NA#establish a vector to hold the values from the 
+#randomly sampled communities
+
+
+reps<- 999## number of iterations of null model to run
+
+## loop to generate null communities and calculate range of trait values within #that community
+for(i in 1:reps){
+	
+	sample(species_pool$logSeedSize,N, 
+	prob = (species_pool$abundance)/(sum(species_pool$abundance)))->random_community
+  #sample the trait(here logLeafArea) values of six species throughout the species
+  #pool.
+	
+	null_ave_range[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species 
+	#pool.
+}
+#Display the frequency of trait ranges for seed size across the random communities
+hist(null_ave_range, xlab=expression("Expected Log Seed Size"), 
+     main="Distribution from Null Model, N=6", 
+     col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range), lty=2)
+text("mean", x=mean(null_ave_range), y=180, pos=4)
+
+## add the observed range from the sampled plot
+  max(plot25$logSeedSize)-min(plot25$logSeedSize)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+
+pval_ses()
+
+```
+
+The results from the modifications to the null model illustrate a similar pattern as before. Nonetheless, I believe that this method was more conservative. Biologically, the first rendition of the model did not consider the importance of abundance on invasibility to plot 25. Species that are more prevalent within the species pool are more likely to disperse into the plot due to the increased amount of seeds they may produce as a unit. In the second rendition, we account for this by weighting the sample by abundance. Statistically, the observed value seemed to be more significantly dissimilar from the null model populations in the first null model compared to the second model for the leaf area trait. For the seed size, the observed value in plot 25 was less similar to the null populations in the second rendition of the null model. Both these findings bode well for the more conservative nature of the weighting approach.
+
+
+##*1.C. Imagine that plot 25 is found near a stream in the reserve, as are sites 20,21 and 28.Use you null model skills to assess the extent to which the patterns that you see a t plot 25 above are driven by broader scale filtering associated with being near a stream, or instead by more local facotrs found at plot 25.Interpret results;Explain rationale.*
+
+```{r}
+
+##Combine species from plots 20,21, 25 and 28 as the river plots. 
+
+#subset species from the river plots to create a river plot matrix from the plot 
+#data
+plot_river <- subset(plot_data,plot_data[,1]==20|plot_data[,1]==21|plot_data[,1]==25|plot_data[,1]==28)#create a subset of the plot data file that only has the 
+#river plot information.
+  plot_river<-merge(species_pool,plot_river, by="species")#merge the subset with 
+  #the corresponding trait values in the species pool dataset
+  plot_river<- plot_river[!duplicated(plot_river$species),]#remove duplicate 
+  #species information
+  
+##Also, create a seperate set of data for each of the above plots 
+  #subset species from each of the plots to create individual plot matrices 
+  #from the plot data
+
+plot20 <- subset(plot_data,plot_data[,1]==20)
+plot21 <- subset(plot_data,plot_data[,1]==21)
+plot28 <- subset(plot_data,plot_data[,1]==28) 
+
+#merge with the data from species_pool data frame
+
+plot20<-merge(species_pool,plot20, by="species")
+plot21<-merge(species_pool,plot21, by="species")
+plot28<-merge(species_pool,plot28, by="species")
+``` 
+
+```{r}
+###Compare the overall observed mean in the river plots to the species pool using 
+#weighted null model for 1.B. Should illustrate if there is something significant 
+#with respect to certain traits of being near a river.
+
+##use the null model to create a random communities of the same amount of species 
+#available in the river plots. Run 999 times. Create different null communities 
+#for each trait.
+N_river<- 16
+null_ave_range3<-NA#establish a vector to hold the values from the randomly 
+#sampled communities
+
+reps<- 999## number of iterations of null model to run
+
+## loop to generate null communities and calculate range of trait values within 
+#that community
+for(i in 1:reps){
+	
+	sample(species_pool$logLeafArea,N_river, 
+	 prob= (species_pool$abundance)/sum(species_pool$abundance))->random_community
+  #sample the
+  #trait(here logLeafArea) values of six species throughout the species pool.
+	
+	null_ave_range3[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species 
+	#pool.
+}
+
+hist(null_ave_range3, xlab=expression("Expected Log Leaf Area"), 
+     main="Distribution from Null Model, N=16", 
+     col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range3, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range3), lty=2)
+text("mean", x=mean(null_ave_range3), y=180, pos=4)
+
+## add the observed range from the sampled plot
+  max(plot_river$logLeafArea)-min(plot_river$logLeafArea)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+
+##Compare the traits of Log Leaf Area and Log Seed Size.
+
+## how many null values is the observed value less than?
+n_more <- sum(obs_range<null_ave_range3)
+## how many null values is the observed value greater than?
+n_less <-sum(obs_range>null_ave_range3)
+## how many null values is the observed value tied with ?
+n_tied<-sum(obs_range==null_ave_range3)
+
+## p results  
+
+## construct a two tailed test
+
+if(n_less< ((reps+1)/2)){
+	print(c("log leaf area two tailed test, p:", (n_less + n_tied/2)*2 / (reps+1) ))
+}else{
+	print(c("log leaf area two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
+}
+
+## calculate the standard effect size (s.e.s.)
+
+#calculate mean and standard deviation of null distribution:
+null_mean3<-mean(null_ave_range3)
+null_sd3<-sd(null_ave_range3)
+
+size_range_SES<-(obs_range- null_mean3)/null_sd3
+
+print(c("standard effect size for log leaf area:", round(size_range_SES, 3)))
+
+######Seed Size########
+
+for(i in 1:reps){
+	
+	sample(species_pool$logSeedSize,N_river, 
+	 prob= (species_pool$abundance)/sum(species_pool$abundance))->random_community
+  #sample the
+#trait(here logLeafArea) values of six species throughout the species pool.
+	
+	null_ave_range3[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species 
+	#pool.
+}
+
+hist(null_ave_range3, xlab=expression("Expected Log Seed Size"), main="Distribution from Null Model, N=16", col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range3, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range3), lty=2)
+text("mean", x=mean(null_ave_range3), y=270, pos=2)
+
+## add the observed range from the sampled plot
+  max(plot_river$logSeedSize)-min(plot_river$logSeedSize)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+##Compare the traits of Log Leaf Area and Log Seed Size.
+
+     #pval_ses
+## how many null values is the observed value less than?
+n_more <- sum(obs_range<null_ave_range3)
+## how many null values is the observed value greater than?
+n_less <-sum(obs_range>null_ave_range3)
+## how many null values is the observed value tied with?
+n_tied<-sum(obs_range==null_ave_range3)
+
+## p results
+
+## construct a two tailed test
+
+if(n_less< ((reps+1)/2)){
+	print(c("log seed size two tailed test, p:", (n_less + n_tied/2)*2 / (reps+1) ))
+}else{
+	print(c("log seed size two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
+}
+
+## calculate the standard effect size (s.e.s.)
+
+#calculate mean and standard deviation of null distribution:
+null_mean3<-mean(null_ave_range3)
+null_sd3<-sd(null_ave_range3)
+
+size_range_SES<-(obs_range- null_mean3)/null_sd3
+
+print(c("standard effect size for log seed size:", round(size_range_SES, 3)))
+
+```
+
+```{r}
+###Compare the observed mean in plot 25 to the distributions of plot 20,21 and 28 
+#to determine if there is some trait that is unique to plot 25 that distinguishes 
+#it from the other river plots.
+
+##use the null model to create a random communities of the same amount of species 
+#available in the river plots. Run 999 times. Create different null communities 
+#for each trait.
+
+##Compare the traits of Log Leaf Area and Log Seed Size.
+
+
+##Leaf Area##
+N<- 6
+
+null_ave_range4<-NA#establish a vector to hold the values from the randomly 
+#sampled communities
+
+reps<- 9999## number of iterations of null model to run
+
+## loop to generate null communities and calculate range of trait values within 
+#that community
+for(i in 1:reps){
+	
+	sample(plot_river$logLeafArea,N,
+	prob= (plot_river$abundance)/sum(plot_river$abundance))->random_community
+  #sample the 
+#trait(here logLeafArea) values of six species throughout the species pool.
+	
+	null_ave_range4[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species 
+	#pool.
+}
+
+hist(null_ave_range4, xlab=expression("Expected Log Leaf Area"), 
+     main="Distribution from Null Model, N=6", 
+     col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range4, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range4), lty=2)
+text("mean", x=mean(null_ave_range4), y=180, pos=4)
+
+## add the observed range from the sampled plot
+  max(plot25$logLeafArea)-min(plot25$logLeafArea)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+
+## how many null values is the observed value less than?
+n_more <- sum(obs_range<null_ave_range4)
+## how many null values is the observed value greater than?
+n_less <-sum(obs_range>null_ave_range4)
+## how many null values is the observed value tied with?
+n_tied<-sum(obs_range==null_ave_range4)
+
+## p results 
+
+## construct a two tailed test
+
+if(n_less< ((reps+1)/2)){
+	print(c("leaf area two tailed test, p:", (n_less + n_tied/2)*2 / (reps+1) ))
+}else{
+	print(c("leaf area two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
+}
+
+## calculate the standard effect size (s.e.s.)
+
+#calculate mean and standard deviation of null distribution:
+null_mean4<-mean(null_ave_range4)
+null_sd4<-sd(null_ave_range4)
+
+size_range_SES<-(obs_range- null_mean4)/null_sd4
+
+print(c("standard effect size:", round(size_range_SES, 3)))
+
+##Seed Size##
+
+## loop to generate null communities and calculate range of trait values within 
+#that community
+for(i in 1:reps){
+	
+	sample(plot_river$logSeedSize,N, 
+	 prob= (plot_river$abundance)/sum(plot_river$abundance))->random_community
+  #sample the 
+#trait(here logLeafArea) values of six species throughout the species pool.
+	
+	null_ave_range4[i]<- max(random_community)-min(random_community)#find the range 
+	#of the trait values for each random community sampled from the the species 
+	#pool.
+}
+
+hist(null_ave_range4, xlab=expression("Expected Log Seed Size"), main="Distribution from Null Model, N=6", col="light grey")
+
+## quick *estimate* of sig. thresholds for plotting (for a two-tailed test)
+quantile(null_ave_range4, probs=c(0.025, .975))->cutoffs
+abline(v=cutoffs, lty=2)
+text("2.5%", x=cutoffs[1], y=180, pos=4)
+text("97.5%", x=cutoffs[2], y=180, pos=2.5)
+
+## expected value (mean) from null:
+abline(v=mean(null_ave_range4), lty=2)
+text("mean", x=mean(null_ave_range4), y=180, pos=4)
+
+## add the observed range from the sampled plot
+  max(plot25$logSeedSize)-min(plot25$logSeedSize)->obs_range
+
+abline(v=obs_range, col='red', lwd=3)
+text("observed value", x=obs_range, y=230, pos=4, col="red")
+     
+#pval_ses
+## how many null values is the observed value less than?
+n_more <- sum(obs_range<null_ave_range4)
+## how many null values is the observed value greater than?
+n_less <-sum(obs_range>null_ave_range4)
+## how many null values is the observed value tied with? 
+n_tied<-sum(obs_range==null_ave_range4)
+
+## p results 
+
+## construct a two tailed test
+
+if(n_less< ((reps+1)/2)){
+	print(c("seed size two tailed test, p:", (n_less + n_tied/2)*2 / (reps+1) ))
+}else{
+	print(c("seed size two tailed test, p:", (n_more + n_tied/2)*2 / (reps+1) ))
+}
+
+## calculate the standard effect size (s.e.s.)
+
+#calculate mean and standard deviation of null distribution:
+null_mean4<-mean(null_ave_range4)
+null_sd4<-sd(null_ave_range4)
+
+size_range_SES<-(obs_range- null_mean4)/null_sd4
+
+print(c("standard effect size:", round(size_range_SES, 3)))
+
+```
+Here I first attempted to compare the traits ranges between the river communities and the entire species pool. I found that there were 16 species unique to this region and created random communities of 16 species from the species pool and compared them with the observed values of leaf area and seed size from the river species. The river species were significantly different from the species pool with respect to their leaf area trait but not their seed size trait values. Next, I compared the species from plot 25 to the river species to determine if there was something special about the trait values of that plot. The plants were not significantly different from those species found in the river in either traits which may indicate there is some trait qualities that are more well suited to the being near the river and not necessarily in plot 25. 
+
+## 1.D. To encorporate the trait correlation, we could create a ratio between the two traits and include it in sampling probability. This modification would not resolve the narcissus effect in this case. The Narcissus effect decribes a condition where looking at the resulting distribution of traits within communities does not accurately exhibit the impact of underlying mechanisms that have allowed certain species to inhabit a particular community. Here, in manipulating the traits that are correlated alone, we do not attempt to illucidate these mechanisms driving the correlation between wood density and log SLA. Consequently, I think that a method to resolve the narcissus effect would involve include the trait correlations with larger scale abiotic features that may indicate the importance of individuals traits in the correlation.
+
+
