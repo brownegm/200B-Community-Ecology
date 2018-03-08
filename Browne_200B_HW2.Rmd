@@ -15,4 +15,23 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 setwd("~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology")
 
+#simulate_metacommunity<-source("~/3 process model.R")
+hetero<-NA
+for(i in 1:10){
+
+  output<-simulate_metacommunity()
+
+  hetero[i]<-var(output)#Use the variance in the relative abundance of species 1 at 50 yrs to determine heterogeneity in composition across communities.
+
+  #trace_metacommunity(output)
+}
+
+hist(hetero) 
+
+
+
+#Describe the overall interaction that you see between these two processes. 
+
+#Plot the findings. 
+
 ```
