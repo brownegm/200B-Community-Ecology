@@ -142,7 +142,7 @@ simulate_metacommunity=function(years=50, patches=10, J=100, m=0, fitness_ratio_
 trace_metacommunity=function(df, title="your title here"){
 	## expects output from simulate_metacommunity()
 	## you can add any title you like to track parameters, etc
-	plot(1:nrow(df), df[,1], type='l', xlab="years", ylab="frequency of species 1", ylim=c(0,1), main=title)
+	plot(1:nrow(df), df[,1], type='l', xlab="Years", ylab="Freq. of Species 1", ylim=c(0,1), main=title)
 	for(i in 2:(ncol(df))){
 		lines(1:nrow(df), df[,i], type='l')
 	}
@@ -155,36 +155,36 @@ trace_metacommunity=function(df, title="your title here"){
 
 ## run functions above first to save into memory.
 
-pdf("Sims_basic processes.pdf", width=8, height=9)
-layout(matrix(1:6, nrow=3, byrow=T))
+#pdf("Sims_basic processes.pdf", width=8, height=9)
+#layout(matrix(1:6, nrow=3, byrow=T))
 
 ### local processes: drift with no migration:
-simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1,10), frequency_dependence=rep(0,10))->output
-trace_metacommunity(output, "neutral, J=100, m=0")
+#simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1,10), frequency_dependence=rep(0,10))->output
+#trace_metacommunity(output, "neutral, J=100, m=0")
 
 ## effect of J on drift, still no migration:
-simulate_metacommunity(years=50, patches=10, J=1000, m=0, fitness_ratio_ave=rep(1,10), frequency_dependence=rep(0,10))->output
-trace_metacommunity(output, "neutral, J=1000, m=0")
+#simulate_metacommunity(years=50, patches=10, J=1000, m=0, fitness_ratio_ave=rep(1,10), frequency_dependence=rep(0,10))->output
+#trace_metacommunity(output, "neutral, J=1000, m=0")
 
 ## constant selection- e.g. habitat filtering:
 
 ## one patch type, no migration:
-simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1.2,10), frequency_dependence=rep(0,10))->output
-trace_metacommunity(output, "constant selection, fitRatio = 1.2, J=100, m=0")
+#simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1.2,10), frequency_dependence=rep(0,10))->output
+#trace_metacommunity(output, "constant selection, fitRatio = 1.2, J=100, m=0")
 
 ## two symmetric patch types, no migration:
-simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)), frequency_dependence=rep(0,10))->output
-trace_metacommunity(output, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2")
+#simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)), frequency_dependence=rep(0,10))->output
+#trace_metacommunity(output, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2")
 
 ## weak negative frequency dependence with a fitness difference, no migration:
 
-simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1.1,10), frequency_dependence=rep(-.3,10))->output
-trace_metacommunity(output, "freq dependence -.3, fitRatio = 1.1, J=100, m=0")
+#simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1.1,10), frequency_dependence=rep(-.3,10))->output
+#trace_metacommunity(output, "freq dependence -.3, fitRatio = 1.1, J=100, m=0")
 
 ## strong negative frequency dependence with a fitness difference, no migration:
 
-simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1.1,10), frequency_dependence=rep(-.8,10))->output
-trace_metacommunity(output, "freq dependence -.8, fitRatio = 1.1, J=100, m=0")
+#simulate_metacommunity(years=50, patches=10, J=100, m=0, fitness_ratio_ave=rep(1.1,10), frequency_dependence=rep(-.8,10))->output
+#trace_metacommunity(output, "freq dependence -.8, fitRatio = 1.1, J=100, m=0")
 
-dev.off()
+#dev.off()
 

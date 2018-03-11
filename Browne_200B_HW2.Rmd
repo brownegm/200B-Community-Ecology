@@ -3,6 +3,7 @@ title: "Browne_200B_HW2"
 author: "Marvin Browne"
 date: "March 8, 2018"
 output: pdf_document
+fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -11,27 +12,105 @@ knitr::opts_chunk$set(echo = TRUE)
 
 **_Simulating the interactions of fundamental processes_**
 
-**2A**
-```{r}
+##**2A**
+```{r figs, echo=T, fig.cap="\\label{fig:figs}Interactions of Drift and Migration"}
 setwd("~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology")
 
-#simulate_metacommunity<-source("~/3 process model.R")
-hetero<-NA
-for(i in 1:10){
+source('~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology/3 process model.R')
 
-  output<-simulate_metacommunity()
+par(mfrow=c(3,2))
+#1
+simulate_metacommunity(m=0)->output1
+trace_metacommunity(output1, "neutral, J=100, m=0")
+var1<-var(output1[50,])
 
-  hetero[i]<-var(output)#Use the variance in the relative abundance of species 1 at 50 yrs to determine heterogeneity in composition across communities.
+#2
+simulate_metacommunity(m=0.05)->output2
+trace_metacommunity(output2, "neutral, J=100, m=0.05")
+var2<-var(output2[50,])
 
-  #trace_metacommunity(output)
-}
+#3
+simulate_metacommunity(m=0.25)->output3
+trace_metacommunity(output3, "neutral, J=100, m=0.25")
+var3<-var(output3[50,])
 
-hist(hetero) 
+#4
+simulate_metacommunity(m=.75)->output4
+trace_metacommunity(output4, "neutral, J=100, m=0.75")
+var4<-var(output4[50,])
 
+#5
+simulate_metacommunity( m=1.0)->output5
+trace_metacommunity(output5, "neutral, J=100, m=1.0")
+var5<-var(output5[50,])
 
-
-#Describe the overall interaction that you see between these two processes. 
-
-#Plot the findings. 
+variance<-c(var1,var2,var3,var4,var5)
+ms<-c(0,.05,0.25,0.75,1)
+plot(ms,variance,main="Variance in Abundance after 50 Years", xlab="Migration Rate", ylab = "Variance in Abundance",type = "b", pch=16)
 
 ```
+
+As the amount of migration increases, the length of time necessary for the community to reach a stable species composition increases as well. Furthermore, the amount of heterogeneity in the composition across the communities decreases. Additionally, it seems to plateau at greater values of migration(See "Variance in Abundance after 50 Years")
+
+##**2B**
+
+```{r fig, echo=T, fig.cap="\\label{fig:figs}Interaction of Fitness and Migration "}
+
+##How does increasing migration influence variation in community composition 
+##across the landscape? Howe does diversity within local communities vary with increasing migration?
+
+par(mfrow=c(3,2))
+
+## two symmetric patch types, + migration:
+###
+#6
+simulate_metacommunity(m=0,fitness_ratio_ave=c(rep(1.2,5),rep(1/1.2,5)))->output6
+trace_metacommunity(output6, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0")
+var6<-var(output6[50,])
+
+#7
+simulate_metacommunity(m=0.05,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output7
+trace_metacommunity(output7, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0.05")
+var7<-var(output7[50,])
+
+#8
+simulate_metacommunity(m=0.25,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output8
+trace_metacommunity(output8, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0.25")
+var8<-var(output8[50,])
+
+#9
+simulate_metacommunity(m=.75,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output9
+trace_metacommunity(output8, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0.75")
+var9<-var(output9[50,])
+
+#10
+simulate_metacommunity( m=1.0,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output10
+trace_metacommunity(output8, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=1.0")
+var10<-var(output10[50,])
+
+variance<-c(var6,var7,var8,var9,var10)
+ms<-c(0,.05,0.25,0.75,1)
+plot(ms,variance,main="Patch Diversity after 50 Years", xlab="Migration Rate", ylab = "Variance in Abundance",type = "b", pch=16)
+
+```
+
+Increasing migration helps to keep the frequency of each species at equivalent among all of the patches. At lower rates of migration, the fitness effects are stronger driving half of the communities to complete dominance of one species. Furthermore, as the migration rate increases, the diverity among local communities diminishes and eventually stabilizes at greater rates of migration similar to the findings in 2A. **INSERT THEORY THAT IS EVIDENT**
+
+
+##**2C**
+
+```{r fig3}
+##Pick a third combination of two or more processes 
+##and explore how they interact. State quesiton and 
+##describe the simulations that will be used to 
+##address this. Summarize findings graphically and 
+##interpret them. 
+
+##How do ?
+mrates<-c(0,0.1,0.3,0.5,0.7,1)
+outputs<-vector(NA)
+for (i in length(mrates))
+  simulate_metacommunity(m=mrates,fitness_ratio_ave=c(rep(1.2,5),rep(1/1.2,5)))->outputs[i]
+  trace_metacommunity(output6, "two habs, J=100, m=mrates[i]")
+  var[i]<-var(outputs[50,])
+
