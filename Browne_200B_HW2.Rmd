@@ -1,24 +1,28 @@
 ---
-title: "Browne_200B_HW2"
+title: "Interactions of Fundamental Processes"
 author: "Marvin Browne"
-date: "March 8, 2018"
-output: pdf_document
+date: "March 11, 2018"
+output:
+  pdf_document: default
 fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+setwd("~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology")
+
+source('~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology/3 process model.R')
 ```
 
 **_Simulating the interactions of fundamental processes_**
 
-##**2A**
-```{r figs, echo=T, fig.cap="\\label{fig:figs}Interactions of Drift and Migration"}
-setwd("~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology")
+##**2A:**
+As the amount of migration increases, the length of time necessary for the communities to reach a stable species composition increases as well. Furthermore, the amount of heterogeneity in the composition across the communities decreases. Additionally, it seems to plateau at greater values of migration(See Figure 1: "Variance in Abundance after 50 Years").
 
-source('~/UCLA/Winter 2018/200B/Nathan-Part III/200B-Community-Ecology/3 process model.R')
-
-par(mfrow=c(3,2))
+```{r figs,fig.cap="\\label{fig:figs}Interactions of Drift and Migration"}
+###2A###
+par(mfrow=c(3,2))#mar=c(4.5, 4, 3, 3)bottom, left, top, right c(5, 4, 4, 2)
 #1
 simulate_metacommunity(m=0)->output1
 trace_metacommunity(output1, "neutral, J=100, m=0")
@@ -46,18 +50,20 @@ var5<-var(output5[50,])
 
 variance<-c(var1,var2,var3,var4,var5)
 ms<-c(0,.05,0.25,0.75,1)
-plot(ms,variance,main="Variance in Abundance after 50 Years", xlab="Migration Rate", ylab = "Variance in Abundance",type = "b", pch=16)
+plot(ms,variance,main="Variance in Abundance after 50 Years", xlab="Migration Rate", 
+     ylab = "Variance in Abundance",type = "b", pch=16)
 
 ```
 
-As the amount of migration increases, the length of time necessary for the community to reach a stable species composition increases as well. Furthermore, the amount of heterogeneity in the composition across the communities decreases. Additionally, it seems to plateau at greater values of migration(See "Variance in Abundance after 50 Years")
+  
 
-##**2B**
+##**2B:** 
+Increasing migration helps to keep the frequency of each species at equivalent levels among all of the patches. At lower rates of migration, the fitness effects are stronger, driving half of the communities to complete dominance of one species. Furthermore, as the migration rate increases, the diversity among local communities diminishes and eventually stabilizes at greater rates of migration similar to the findings in 2A (Figure 2). Initially, the two habitats are filtering out one of the species but migration allows constant replenishing of the sink populations from those that maintain a higher abundance of the other species. All of the plots in Figure 2 illustrate constant selection in two habitats with fitness ratios of 1.2 and 1/1.2. 
 
-```{r fig, echo=T, fig.cap="\\label{fig:figs}Interaction of Fitness and Migration "}
-
+```{r fig 2, fig.cap="\\label{fig:figs}Interaction of Fitness and Migration "}
+##2B##
 ##How does increasing migration influence variation in community composition 
-##across the landscape? Howe does diversity within local communities vary with increasing migration?
+##across the landscape? How does diversity within local communities vary with increasing migration?
 
 par(mfrow=c(3,2))
 
@@ -65,52 +71,88 @@ par(mfrow=c(3,2))
 ###
 #6
 simulate_metacommunity(m=0,fitness_ratio_ave=c(rep(1.2,5),rep(1/1.2,5)))->output6
-trace_metacommunity(output6, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0")
+trace_metacommunity(output6, "Constant Selection of 2 Habitats, m=0")
 var6<-var(output6[50,])
 
 #7
 simulate_metacommunity(m=0.05,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output7
-trace_metacommunity(output7, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0.05")
+trace_metacommunity(output7, "Constant Selection of 2 Habitats, m=0.05")
 var7<-var(output7[50,])
 
 #8
 simulate_metacommunity(m=0.25,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output8
-trace_metacommunity(output8, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0.25")
+trace_metacommunity(output8, "Constant Selection of 2 Habitats, m=0.25")
 var8<-var(output8[50,])
 
 #9
 simulate_metacommunity(m=.75,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output9
-trace_metacommunity(output8, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=0.75")
+trace_metacommunity(output8, "Constant Selection of 2 Habitats, m=0.75")
 var9<-var(output9[50,])
 
 #10
-simulate_metacommunity( m=1.0,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output10
-trace_metacommunity(output8, "constant selection, 2 habitats, fitRatios = 1.2 & 1/1.2, m=1.0")
+simulate_metacommunity(m=1.0,fitness_ratio_ave=c(rep(1.2,5), rep(1/1.2, 5)))->output10
+trace_metacommunity(output8, "Constant Selection of 2 Habitats, m=1.0")
 var10<-var(output10[50,])
 
 variance<-c(var6,var7,var8,var9,var10)
 ms<-c(0,.05,0.25,0.75,1)
-plot(ms,variance,main="Patch Diversity after 50 Years", xlab="Migration Rate", ylab = "Variance in Abundance",type = "b", pch=16)
+plot(ms,variance,main="Patch Diversity after 50 Years", xlab="Migration Rate", 
+     ylab = "Variance in Abundance",type = "b", pch=16)
 
 ```
 
-Increasing migration helps to keep the frequency of each species at equivalent among all of the patches. At lower rates of migration, the fitness effects are stronger driving half of the communities to complete dominance of one species. Furthermore, as the migration rate increases, the diverity among local communities diminishes and eventually stabilizes at greater rates of migration similar to the findings in 2A. **INSERT THEORY THAT IS EVIDENT**
+##**2C:** 
+The fitness of species one was double that of the second species, which at low levels of frequency dependence resulted in the fixation one species as the major constituent of the patches. This was expected because species 1 was more fit for the conditions in the patches. However, as the slope of frequency dependence becomes more negative, the patch diversity becomes more variable. Initially, half of the patches, presumably those with the weaker effect of selection, increase in heterogeneity and ultimately, the other half follows the same pattern. Accordingly, variance in abundance eventually reaches the original low amount. Nevertheless, the frequency dependence needs to very large to conteract the effects of the fitness difference(Figure 3). In other words, the effects of intraspecific interactions and interspecific interactions need to be equally large for the two species to coexist. 
 
+```{r fig3,fig.cap="\\label{fig:figs}Interaction of Fitness and Frequency Dependence"}
+###2C###
 
-##**2C**
-
-```{r fig3}
 ##Pick a third combination of two or more processes 
-##and explore how they interact. State quesiton and 
+##and explore how they interact. State question and 
 ##describe the simulations that will be used to 
 ##address this. Summarize findings graphically and 
 ##interpret them. 
 
-##How do ?
-mrates<-c(0,0.1,0.3,0.5,0.7,1)
-outputs<-vector(NA)
-for (i in length(mrates))
-  simulate_metacommunity(m=mrates,fitness_ratio_ave=c(rep(1.2,5),rep(1/1.2,5)))->outputs[i]
-  trace_metacommunity(output6, "two habs, J=100, m=mrates[i]")
-  var[i]<-var(outputs[50,])
+##How fitness among the plots and frequency dependence interact? 
+##Can frequency dependence counteract the effect of one species being a lot more fit than the other?
 
+par(mfrow=c(3,2))
+#11
+simulate_metacommunity(frequency_dependence = c(rep(-.5,10)),
+                       fitness_ratio_ave = c(rep(3,5),rep(1.5,5)))->output11
+trace_metacommunity(output11, "Slope of Frequency Dependence  = -0.5")
+var11<-var(output11[50,])
+
+#12
+simulate_metacommunity(frequency_dependence = c(rep(-1.5,10)),
+                       fitness_ratio_ave = c(rep(3,5),rep(1.5,5)))->output12
+trace_metacommunity(output12, "Slope of Frequency Dependence  = -1.5")
+var12<-var(output12[50,])
+
+#13
+simulate_metacommunity(frequency_dependence = c(rep(-2.5,10)),
+                       fitness_ratio_ave = c(rep(3,5),rep(1.5,5)))->output13
+trace_metacommunity(output13, "Slope of Frequency Dependence  = -2.5")
+var13<-var(output13[50,])
+
+#14
+simulate_metacommunity(frequency_dependence = c(rep(-3.5,10)),
+                       fitness_ratio_ave = c(rep(3,5),rep(1.5,5)))->output14
+trace_metacommunity(output14, "Slope of Frequency Dependence  = -3.5")
+var14<-var(output14[50,])
+
+#15
+simulate_metacommunity(frequency_dependence = c(rep(-8.5,10)),
+                       fitness_ratio_ave = c(rep(3,5),rep(1.5,5)))->output15
+trace_metacommunity(output15, "Slope of Frequency Dependence  = -8.5")
+var15<-var(output15[50,])
+
+variance<-c(var11,var12,var13,var14,var15)
+mss<-c(-.5,-1.5,-2.5,-3.5,-8.5)
+plot(mss,variance,main="Patch Diversity after 50 Years", 
+     xlab="Slope of Frequency Dependence", ylab = "Variance in Abundance",type = "b",
+     pch=16, xlim = c(-.5,-9))
+
+```
+
+  
